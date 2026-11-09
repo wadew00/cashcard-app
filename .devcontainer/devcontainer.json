@@ -1,0 +1,26 @@
+{
+  "name": "Spring Backend Lab — Java 17 + PostgreSQL",
+  "dockerComposeFile": "../compose.yaml",
+  "service": "dev",
+  "runServices": [
+    "dev",
+    "postgres"
+  ],
+  "workspaceFolder": "/workspace",
+  "remoteUser": "vscode",
+  "shutdownAction": "stopCompose",
+  "forwardPorts": [
+    8080
+  ],
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-gradle",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "postCreateCommand": "sudo mkdir -p /home/vscode/.gradle && sudo chown -R vscode:vscode /home/vscode/.gradle"
+}

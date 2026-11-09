@@ -1,0 +1,31 @@
+services:
+  dev:
+    image: mcr.microsoft.com/devcontainers/java:17-bookworm
+    command: /bin/sh -c "while sleep 1000; do :; done"
+    volumes:
+      - .:/workspace:cached
+      - gradle_cache:/home/vscode/.gradle
+    working_dir: /workspace
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_DB: springdb
+      POSTGRES_USER: spring
+      POSTGRES_PASSWORD: localdevonly
+    ports:
+      - "127.0.0.1:5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spring -d springdb"]
+      interval: 5s
+      timeout: 3s
+      retries: 15
+
+volumes:
+  postgres_data:
+  gradle_cache:
