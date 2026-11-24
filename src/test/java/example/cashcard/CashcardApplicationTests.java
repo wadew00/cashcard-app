@@ -32,10 +32,12 @@ class CashCardApplicationTests {
 		DocumentContext context = JsonPath.parse(response.getBody());
 		Number id = context.read("$.id");
 		Double amount = context.read("$.amount");
+		String owner = context.read("$.owner");
 		assertThat(id).isNotNull();
 		assertThat(id.longValue()).isEqualTo(99L);
 		assertThat(amount).isNotNull();
 		assertThat(amount).isEqualTo(123.45);
+		assertThat(owner).isEqualTo("sarah1");
 	}
 
 	@Test
@@ -49,7 +51,7 @@ class CashCardApplicationTests {
 	@Test
 	@DirtiesContext
 	void shouldCreateANewCashCard() {
-		CashCard newCashCard = new CashCard(null, 250.00);
+		CashCard newCashCard = new CashCard(null, 250.00, "sarah1");
 		ResponseEntity<Void> createResponse = restTemplate.postForEntity("/cashcards", newCashCard, Void.class);
 		assertThat(createResponse.getStatusCode()).isEqualTo(HttpStatus.CREATED);
 		URI locationOfNewCashCard = createResponse.getHeaders().getLocation();
@@ -61,6 +63,7 @@ class CashCardApplicationTests {
 		assertThat(createdCashCard).isNotNull();
 		assertThat(createdCashCard.id()).isNotNull();
 		assertThat(createdCashCard.amount()).isEqualTo(250.00);
+		assertThat(createdCashCard.owner()).isEqualTo("sarah1");
 	}
 
 	@Test
