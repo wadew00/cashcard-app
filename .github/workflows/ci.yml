@@ -1,0 +1,21 @@
+name: Cash Card CI
+
+on:
+  push:
+    branches: [aws-deployment]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: Run Cash Card tests
+        run: ./gradlew test
