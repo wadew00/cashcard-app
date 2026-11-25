@@ -17,5 +17,6 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
+          cache: gradle
       - name: Run Cash Card tests
         run: ./gradlew test
