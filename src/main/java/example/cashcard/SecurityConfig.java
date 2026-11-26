@@ -1,7 +1,9 @@
 package example.cashcard;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
@@ -18,6 +20,7 @@ class SecurityConfig {
   SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
     http
         .authorizeHttpRequests(request -> request
+            .requestMatchers("/actuator/health").permitAll()
             .requestMatchers("/cashcards/**")
             .hasRole("CARD-OWNER")) // enable RBAC: Replace the .authenticated() call with the hasRole(...) call.
         .httpBasic(Customizer.withDefaults())
@@ -26,6 +29,7 @@ class SecurityConfig {
   }
 
   @Bean
+  @Profile({ "default", "local", "test" })
   UserDetailsService testOnlyUsers(PasswordEncoder passwordEncoder) {
     User.UserBuilder users = User.builder();
     UserDetails sarah = users
@@ -49,5 +53,19 @@ class SecurityConfig {
   @Bean
   PasswordEncoder passwordEncoder() {
     return new BCryptPasswordEncoder();
+  }
+
+  @Bean
+  @Profile("cloud")
+  UserDetailsService cloudUser(
+      @Value("${CASHCARD_AUTH_USERNAME}") String username,
+      @Value("${CASHCARD_AUTH_PASSWORD}") String password,
+      PasswordEncoder passwordEncoder) {
+    UserDetails user = User.withUsername(username)
+        .password(passwordEncoder.encode(password))
+        .roles("CARD-OWNER")
+        .build();
+
+    return new InMemoryUserDetailsManager(user);
   }
 }
